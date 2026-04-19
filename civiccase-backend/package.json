@@ -8,8 +8,11 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@google/genai": "^1.50.1",
     "@langchain/langgraph": "^1.2.9",
+=======
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
     "apollo-server-express": "^3.12.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

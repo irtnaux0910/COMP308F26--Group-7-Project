@@ -3,6 +3,7 @@ const Issue = require("../models/Issue");
 const Notification = require("../models/Notification");
 const generateToken = require("../utils/generateToken");
 const { requireAuth, requireStaff } = require("../middleware/auth");
+<<<<<<< HEAD
 const {
   categorizeIssueWithAI,
 } = require("../services/aiCategorizationService");
@@ -16,6 +17,9 @@ const {
   getHeatmapPoints,
   getTrendInsights,
 } = require("../services/analyticsService");
+=======
+
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
 const resolvers = {
   Query: {
     // Return the currently authenticated user
@@ -60,6 +64,7 @@ const resolvers = {
         })
         .sort({ createdAt: -1 });
     },
+<<<<<<< HEAD
     issueCountsByCategory: async (_, __, { user }) => {
       requireAuth(user);
       const results = await getIssueCountsByCategory();
@@ -97,6 +102,8 @@ const resolvers = {
       const answer = await askCivicBotService(question);
       return { answer };
     },
+=======
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
 
     // Return issues near a given location using geospatial query
     nearbyIssues: async (
@@ -165,14 +172,31 @@ const resolvers = {
       };
     },
 
+<<<<<<< HEAD
     //Create
     createIssue: async (
       _,
       { title, description, category, priority, imageUrl, location },
+=======
+    // Create a new issue (authenticated users)
+    createIssue: async (
+      _,
+      {
+        title,
+        description,
+        category,
+        priority,
+        imageUrl,
+        location,
+        aiCategory,
+        aiSummary,
+      },
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
       { user },
     ) => {
       requireAuth(user);
 
+<<<<<<< HEAD
       let aiCategory = null;
       let aiSummary = null;
       let aiPriority = null;
@@ -191,6 +215,13 @@ const resolvers = {
         description,
         category: category || aiCategory || "OTHER",
         priority: priority || aiPriority || "MEDIUM",
+=======
+      const issue = await Issue.create({
+        title,
+        description,
+        category: category || "OTHER",
+        priority: priority || "MEDIUM",
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
         imageUrl,
         location: {
           type: "Point",
@@ -202,6 +233,7 @@ const resolvers = {
         aiSummary,
       });
 
+<<<<<<< HEAD
       const populatedIssue = await Issue.findById(issue._id)
         .populate("reportedBy")
         .populate("assignedTo");
@@ -221,6 +253,11 @@ const resolvers = {
       }
 
       return populatedIssue;
+=======
+      return await Issue.findById(issue._id)
+        .populate("reportedBy")
+        .populate("assignedTo");
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
     },
 
     // Update issue status (staff only)

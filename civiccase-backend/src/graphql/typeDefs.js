@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const { gql } = require("apollo-server-express");
+=======
+const { gql } = require('apollo-server-express');
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
 
 const typeDefs = gql`
   enum Role {
@@ -49,6 +53,7 @@ const typeDefs = gql`
     coordinates: [Float]
     address: String
   }
+<<<<<<< HEAD
   type CountItem {
     label: String!
     count: Int!
@@ -65,6 +70,8 @@ const typeDefs = gql`
     count: Int!
     changePercent: Float!
   }
+=======
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
 
   type Issue {
     id: ID!
@@ -82,9 +89,12 @@ const typeDefs = gql`
     createdAt: String
     updatedAt: String
   }
+<<<<<<< HEAD
   type ChatbotResponse {
     answer: String!
   }
+=======
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
 
   type Notification {
     id: ID!
@@ -114,6 +124,7 @@ const typeDefs = gql`
     issues: [Issue!]!
     issue(id: ID!): Issue
     myNotifications: [Notification!]!
+<<<<<<< HEAD
     nearbyIssues(
       longitude: Float!
       latitude: Float!
@@ -125,6 +136,9 @@ const typeDefs = gql`
     heatmapPoints: [HeatmapPoint!]!
     trendInsights: [TrendInsight!]!
     askCivicBot(question: String!): ChatbotResponse!
+=======
+    nearbyIssues(longitude: Float!, latitude: Float!, maxDistance: Int): [Issue!]!
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
   }
 
   type Mutation {
@@ -145,6 +159,11 @@ const typeDefs = gql`
       priority: Priority
       imageUrl: String
       location: LocationInput!
+<<<<<<< HEAD
+=======
+      aiCategory: String
+      aiSummary: String
+>>>>>>> 73e57ebb4e2b758352596fdc622371743863be7c
     ): Issue!
 
     updateIssueStatus(id: ID!, status: IssueStatus!): Issue!
