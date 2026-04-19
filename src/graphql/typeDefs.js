@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-express');
+const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
   enum Role {
@@ -49,6 +49,22 @@ const typeDefs = gql`
     coordinates: [Float]
     address: String
   }
+  type CountItem {
+    label: String!
+    count: Int!
+  }
+
+  type HeatmapPoint {
+    lat: Float!
+    lng: Float!
+    count: Int!
+  }
+
+  type TrendInsight {
+    category: String!
+    count: Int!
+    changePercent: Float!
+  }
 
   type Issue {
     id: ID!
@@ -65,6 +81,9 @@ const typeDefs = gql`
     aiSummary: String
     createdAt: String
     updatedAt: String
+  }
+  type ChatbotResponse {
+    answer: String!
   }
 
   type Notification {
@@ -95,7 +114,17 @@ const typeDefs = gql`
     issues: [Issue!]!
     issue(id: ID!): Issue
     myNotifications: [Notification!]!
-    nearbyIssues(longitude: Float!, latitude: Float!, maxDistance: Int): [Issue!]!
+    nearbyIssues(
+      longitude: Float!
+      latitude: Float!
+      maxDistance: Int
+    ): [Issue!]!
+    issueCountsByCategory: [CountItem!]!
+    statusCounts: [CountItem!]!
+    highPriorityIssues: [Issue!]!
+    heatmapPoints: [HeatmapPoint!]!
+    trendInsights: [TrendInsight!]!
+    askCivicBot(question: String!): ChatbotResponse!
   }
 
   type Mutation {
@@ -116,8 +145,6 @@ const typeDefs = gql`
       priority: Priority
       imageUrl: String
       location: LocationInput!
-      aiCategory: String
-      aiSummary: String
     ): Issue!
 
     updateIssueStatus(id: ID!, status: IssueStatus!): Issue!

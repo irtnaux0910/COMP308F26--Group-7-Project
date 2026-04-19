@@ -1,30 +1,30 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const issueSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, 'Title is required'],
+      required: [true, "Title is required"],
       trim: true,
     },
     description: {
       type: String,
-      required: [true, 'Description is required'],
+      required: [true, "Description is required"],
     },
     category: {
       type: String,
-      enum: ['POTHOLE', 'STREETLIGHT', 'FLOODING', 'SAFETY', 'OTHER'],
-      default: 'OTHER',
+      enum: ["POTHOLE", "STREETLIGHT", "FLOODING", "SAFETY", "OTHER"],
+      default: "OTHER",
     },
     status: {
       type: String,
-      enum: ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'],
-      default: 'OPEN',
+      enum: ["OPEN", "IN_PROGRESS", "RESOLVED", "REJECTED"],
+      default: "OPEN",
     },
     priority: {
       type: String,
-      enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
-      default: 'MEDIUM',
+      enum: ["LOW", "MEDIUM", "HIGH", "URGENT"],
+      default: "MEDIUM",
     },
     imageUrl: {
       type: String,
@@ -32,8 +32,8 @@ const issueSchema = new mongoose.Schema(
     location: {
       type: {
         type: String,
-        enum: ['Point'],
-        default: 'Point',
+        enum: ["Point"],
+        default: "Point",
       },
       coordinates: {
         type: [Number], // [longitude, latitude]
@@ -45,12 +45,12 @@ const issueSchema = new mongoose.Schema(
     },
     reportedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       default: null,
     },
     aiCategory: {
@@ -60,10 +60,10 @@ const issueSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // 2dsphere index for geospatial queries
-issueSchema.index({ location: '2dsphere' });
+issueSchema.index({ location: "2dsphere" });
 
-module.exports = mongoose.model('Issue', issueSchema);
+module.exports = mongoose.model("Issue", issueSchema);

@@ -3,7 +3,19 @@ const Issue = require("../models/Issue");
 const Notification = require("../models/Notification");
 const generateToken = require("../utils/generateToken");
 const { requireAuth, requireStaff } = require("../middleware/auth");
-
+const {
+  categorizeIssueWithAI,
+} = require("../services/aiCategorizationService");
+const {
+  askCivicBot: askCivicBotService,
+} = require("../services/chatbotService");
+const {
+  getIssueCountsByCategory,
+  getStatusCounts,
+  getHighPriorityIssues,
+  getHeatmapPoints,
+  getTrendInsights,
+} = require("../services/analyticsService");
 const resolvers = {
   Query: {
     // Return the currently authenticated user
@@ -47,6 +59,43 @@ const resolvers = {
           populate: [{ path: "reportedBy" }, { path: "assignedTo" }],
         })
         .sort({ createdAt: -1 });
+    },
+    issueCountsByCategory: async (_, __, { user }) => {
+      requireAuth(user);
+      const results = await getIssueCountsByCategory();
+      return results.map((item) => ({
+        label: item._id || "OTHER",
+        count: item.count,
+      }));
+    },
+
+    statusCounts: async (_, __, { user }) => {
+      requireAuth(user);
+      const results = await getStatusCounts();
+      return results.map((item) => ({
+        label: item._id,
+        count: item.count,
+      }));
+    },
+
+    highPriorityIssues: async (_, __, { user }) => {
+      requireStaff(user);
+      return await getHighPriorityIssues();
+    },
+
+    heatmapPoints: async (_, __, { user }) => {
+      requireAuth(user);
+      return await getHeatmapPoints();
+    },
+
+    trendInsights: async (_, __, { user }) => {
+      requireAuth(user);
+      return await getTrendInsights();
+    },
+    askCivicBot: async (_, { question }, { user }) => {
+      requireAuth(user);
+      const answer = await askCivicBotService(question);
+      return { answer };
     },
 
     // Return issues near a given location using geospatial query
@@ -116,28 +165,32 @@ const resolvers = {
       };
     },
 
-    // Create a new issue (authenticated users)
+    //Create
     createIssue: async (
       _,
-      {
-        title,
-        description,
-        category,
-        priority,
-        imageUrl,
-        location,
-        aiCategory,
-        aiSummary,
-      },
+      { title, description, category, priority, imageUrl, location },
       { user },
     ) => {
       requireAuth(user);
 
+      let aiCategory = null;
+      let aiSummary = null;
+      let aiPriority = null;
+
+      try {
+        const aiResult = await categorizeIssueWithAI(title, description);
+        aiCategory = aiResult.aiCategory || null;
+        aiSummary = aiResult.aiSummary || null;
+        aiPriority = aiResult.priority || null;
+      } catch (error) {
+        console.error("AI categorization failed:", error.message);
+      }
+
       const issue = await Issue.create({
         title,
         description,
-        category: category || "OTHER",
-        priority: priority || "MEDIUM",
+        category: category || aiCategory || "OTHER",
+        priority: priority || aiPriority || "MEDIUM",
         imageUrl,
         location: {
           type: "Point",
@@ -149,9 +202,25 @@ const resolvers = {
         aiSummary,
       });
 
-      return await Issue.findById(issue._id)
+      const populatedIssue = await Issue.findById(issue._id)
         .populate("reportedBy")
         .populate("assignedTo");
+
+      // Optional urgent alert for staff
+      if (populatedIssue.priority === "URGENT") {
+        const staffUsers = await User.find({ role: "MUNICIPAL_STAFF" });
+
+        for (const staff of staffUsers) {
+          await Notification.create({
+            user: staff._id,
+            issue: populatedIssue._id,
+            message: `Urgent issue reported: "${populatedIssue.title}"`,
+            type: "URGENT_ALERT",
+          });
+        }
+      }
+
+      return populatedIssue;
     },
 
     // Update issue status (staff only)
